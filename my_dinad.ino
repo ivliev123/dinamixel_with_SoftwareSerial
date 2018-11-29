@@ -10,9 +10,11 @@ ros::NodeHandle  nh;
 
 
 int servo_data=0;
+int flag=0;
 
 void servo_cb( const std_msgs::UInt16& cmd_msg){
-  servo_data=map(cmd_msg.data, 0, 300, 0, 1023);;
+  servo_data=map(cmd_msg.data, 0, 300, 0, 1023);
+  flag=1;
    
   }
 
@@ -60,7 +62,9 @@ void setup() {
 
 void loop() { 
 
+if (flag==1){
 moveSpeed(254,servo_data,100);
+}
   nh.spinOnce();
 
 }
