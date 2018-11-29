@@ -2,6 +2,22 @@
 SoftwareSerial mySerial(10, 11); // RX, TX
 #include "Arduino.h"
 #include "AX12A.h"
+#include <ros.h>
+#include <std_msgs/UInt16.h>
+
+ros::NodeHandle  nh;
+
+
+
+int servo_data=0;
+
+void servo_cb( const std_msgs::UInt16& cmd_msg){
+  servo_data=map(cmd_msg.data, 0, 300, 0, 1023);;
+   
+  }
+
+
+ros::Subscriber<std_msgs::UInt16> sub("servo", servo_cb);
 
   unsigned char Checksum;
   unsigned char Direction_Pin;
@@ -32,19 +48,21 @@ SoftwareSerial mySerial(10, 11); // RX, TX
 
 int16_t speed1[3]={50,10,11};
 
-int sendAXPacket(unsigned char *packet, unsigned int length);
-void setup() {
 
+void setup() {
+  nh.initNode();
+  nh.subscribe(sub);
+  
   mySerial.begin(1000000);
   setEndless(254, OFF);
 
 }
 
 void loop() { 
-//  for (int i=0; i<3;i++){
-//   mySerial.write( speed1[i]); 
-//  }
-moveSpeed(254,100,100);
+
+moveSpeed(254,servo_data,100);
+  nh.spinOnce();
+
 }
 
 int move(unsigned char ID, int Position)
